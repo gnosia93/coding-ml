@@ -1,15 +1,16 @@
 
 ### 큰 한영 혼용 텍스트 → NLP 데이터셋 의 표준 파이프라인 ###
 ```
-1. 줄 단위 스트리밍으로 파일 읽기
-2. 가벼운 정제
-3. SentencePiece BPE 로 토크나이저 직접 학습 (한영 자동 처리)
-4. 전체 텍스트를 토큰 ID 로 변환 후 바이너리 저장 (numpy memmap)
-5. PyTorch Dataset 에서 memmap 으로 lazy 로드
-6. DataLoader 로 학습 루프에 공급
+1. 원본 텍스트 파일 수집    ← 이미 하신 일 (wiki 덤프 받음)
+2. 정제 (cleaning)      ← wikiextractor 같은 도구로 처리. 선택적
+3. 문장/문서 단위로 분할    ← 선택적
+4. 토크나이저 학습         ← 아래 '코크나이저 학습' 샘플 코드로 처리
+5. 토큰 → 정수 ID 변환
+6. PyTorch Dataset
+7. DataLoader
 ```
 
-### 샘플코드 ###
+### 토크나이저 학습 ###
 ```
 import sentencepiece as spm
 import numpy as np
