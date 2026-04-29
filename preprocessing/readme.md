@@ -9,6 +9,23 @@
 6. PyTorch Dataset
 7. DataLoader
 ```
+### 1. 텍스트 파일 수집 ###
+```
+# 한국어 덤프 다운로드 (약 1GB)
+wget https://dumps.wikimedia.org/kowiki/latest/kowiki-latest-pages-articles.xml.bz2
+
+# 영어 덤프 (20 GB 넘음, 시간 오래 걸림)
+wget https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles.xml.bz2
+
+# 압축 해제는 따로 안 해도 됨 (wikiextractor 가 .bz2 직접 읽음)
+
+# wikiextractor 로 plain text 추출
+pip install wikiextractor
+python -m wikiextractor.WikiExtractor kowiki-latest-pages-articles.xml.bz2 \
+    --output extracted_ko \
+    --bytes 100M \
+    --processes 4
+```
 
 ### 2. 정제 ###
 꼭 해야 할 것
