@@ -55,6 +55,13 @@ def clean_text(text):
     return text.strip()
 ```
 
+HTML 많이 섞인 진짜 웹 크롤링 데이터면 정규식보다 BeautifulSoup 이 좋다.
+```
+from bs4 import BeautifulSoup
+
+def clean_html(text):
+    return BeautifulSoup(text, 'html.parser').get_text()
+```
 
 
 ### 4. 토크나이저 학습 ###
