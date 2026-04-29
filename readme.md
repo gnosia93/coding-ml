@@ -13,9 +13,9 @@ coding-ml-lab/
 │   └── mnist_lstm.py
 ├── 05_transfer_learning/
 │   └── vgg_finetune.py
-├── 06_transformer/       ← 다음 단계
+├── 06_transformer/       
 │   └── attention.py
-├── 07_generative/        ← 더 나중
+├── 07_generative/        
 │   └── autoencoder.py
 └── README.md
 
