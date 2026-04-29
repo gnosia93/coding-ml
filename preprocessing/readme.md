@@ -66,33 +66,43 @@ def clean_html(text):
 
 ### 4. 토크나이저 학습 ###
 ```
+import os
 import sentencepiece as spm
 import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
 
-# === Step 1: 토크나이저 학습 (최초 1번) ===
-spm.SentencePieceTrainer.train(
-    input='wiki_clean.txt',
-    model_prefix='ko_en_bpe',
-    vocab_size=32000,
-    model_type='bpe',
-    character_coverage=0.9995,
-    pad_id=0, unk_id=1, bos_id=2, eos_id=3,
-)
+RAW_TEXT = 'wiki_clean.txt'
+SP_MODEL = 'ko_en_bpe.model'
+TOKENS_BIN = 'tokens.bin'
 
-# === Step 2: 토크나이저 로드 ===
+# === 1단계: 토크나이저 (없으면 학습) ===
+if not os.path.exists(SP_MODEL):
+    print('Training tokenizer...')
+    spm.SentencePieceTrainer.train(
+        input=RAW_TEXT,
+        model_prefix='ko_en_bpe',
+        vocab_size=32000,
+        model_type='bpe',
+        character_coverage=0.9995,
+        pad_id=0, unk_id=1, bos_id=2, eos_id=3,
+    )
+
 sp = spm.SentencePieceProcessor()
-sp.load('ko_en_bpe.model')
+sp.load(SP_MODEL)
 
-# === Step 3: 전체 텍스트 → 토큰 파일 (최초 1번) ===
-with open('wiki_clean.txt', encoding='utf-8') as f, \
-     open('tokens.bin', 'wb') as out:
-    for line in f:
-        ids = sp.encode(line.strip(), out_type=int)
-        np.array(ids, dtype=np.uint16).tofile(out)
+# === 2단계: 바이너리 토큰 파일 (없으면 생성) ===
+if not os.path.exists(TOKENS_BIN):
+    print('Encoding text to tokens.bin...')
+    with open(RAW_TEXT, encoding='utf-8') as f, open(TOKENS_BIN, 'wb') as out:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            ids = sp.encode(line, out_type=int)
+            np.array(ids, dtype=np.uint16).tofile(out)
 
-# === Step 4: Dataset & DataLoader ===
+# === 3단계: Dataset & DataLoader (매번) ===
 class LMDataset(Dataset):
     def __init__(self, tokens_path, block_size=512):
         self.data = np.memmap(tokens_path, dtype=np.uint16, mode='r')
@@ -108,14 +118,11 @@ class LMDataset(Dataset):
         y = torch.from_numpy(chunk[1:])
         return x, y
 
-dataset = LMDataset('tokens.bin', block_size=512)
+dataset = LMDataset(TOKENS_BIN, block_size=512)
 loader = DataLoader(dataset, batch_size=32, shuffle=True, num_workers=2)
 
-# === Step 5: 학습 루프에서 사용 ===
+# 이제 학습 루프
 for x, y in loader:
-    # x, y: (batch, block_size)
-    logits = model(x)
-    loss = criterion(logits.view(-1, vocab_size), y.view(-1))
-    ...
-
+    print(x.shape, y.shape)   # (32, 512), (32, 512)
+    break
 ```
