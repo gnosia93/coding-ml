@@ -39,3 +39,4 @@ coding-ml-lab/
 ## 레퍼런스 ##
 
 * https://www.youtube.com/playlist?list=PLhhyoLH6IjfxeoooqP9rhU3HJIAVAJ3Vz
+* https://www.youtube.com/@mildlyoverfitted
